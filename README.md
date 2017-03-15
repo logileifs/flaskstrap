@@ -2,7 +2,7 @@
 flaskstrap sets up a new skeleton flask project and helps you get up and running live just with a few commands
 
 ## Install
-´pip install flaskstrap´
+`pip install flaskstrap`
 
 ## Usage
 
