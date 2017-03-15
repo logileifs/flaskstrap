@@ -1,0 +1,12 @@
+
+user: ''
+host: ''
+
+dependencies:
+  - 'uwsgi'
+  - 'nginx'
+  - 'python-pip'
+  - 'build-essential'
+  - 'libssl-dev'
+  - 'libffi-dev'
+  - 'python-dev'
