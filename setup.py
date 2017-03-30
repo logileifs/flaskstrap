@@ -28,7 +28,11 @@ setup(
 		'pyyaml',
 	],
 	entry_points={
-		"console_scripts": ['flaskstrap = flaskstrap.flaskstrap:main']
+		"console_scripts": [
+			'flaskstrap = flaskstrap.flaskstrap:main',
+			'fstrap = flaskstrap.flaskstrap:main',
+			#'fstrap-init = flaskstrap.flaskstrap:init'
+		]
 	},
 	version=version,
 	description="Easily create a flask, nginx, uwsgi and bootstrap project ready for deployment",

@@ -5,4 +5,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return 'hello world'
+	url = 'https://cloud.githubusercontent.com/assets/2317815/24526433/b0cf65ac-158d-11e7-9c87-75a2f4c929d9.gif'
+	alt = "It's alive!!!"
+	return '<img src="%s" alt="%s">' % (url, alt)
+
+
+app.run()

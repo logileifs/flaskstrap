@@ -7,23 +7,31 @@
 __version__ = "0.2.1"
 
 
-import sys
+#import sys
 #from .stuff import Stuff
-import create_project
-#from create_project import run
+import argparse
+import config as cfg
+#import create_project
+import commands
+from .utils import dprint
+from .utils import exit
+
+parser = argparse.ArgumentParser()
+parser.add_argument('command')
+parser.add_argument('name')
+parser.add_argument('--debug', dest='debug', action='store_true')
+
+args = parser.parse_args()
 
 
 def main():
-	print("flaskstrap version %s." % __version__)
-	#print("List of argument strings: %s" % sys.argv[1:])
-	command = sys.argv[1]
-	print('command: %s' % command)
+	if args.debug:
+		cfg.debug = True
+	dprint("flaskstrap version %s." % __version__)
+	command = args.command
+	dprint('command: %s' % command)
 
-	if command == 'init':
-		name = sys.argv[2]
-		create_project.run(name)
-	#print("Stuff and Boo():\n%s\n%s" % (Stuff, Boo()))
-
-
-class Boo():
-	pass
+	try:
+		getattr(commands, command)(args)
+	except AttributeError as e:
+		exit('command %s not supported' % command)
