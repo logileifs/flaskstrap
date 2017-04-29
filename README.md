@@ -6,8 +6,11 @@ flaskstrap sets up a new skeleton flask project and helps you get up and running
 
 ## Example
 `$ mkvirtualenv new_project`
+
 `$ pip install flaskstrap`
+
 `$ flaskstrap init new_project`
+
 `$ tree new_project`
 ```
 new_project/
