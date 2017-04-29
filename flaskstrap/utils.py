@@ -1,4 +1,4 @@
-import config as cfg
+from . import config as cfg
 
 
 def dprint(string):
