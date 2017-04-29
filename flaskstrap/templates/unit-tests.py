@@ -15,4 +15,3 @@ class TestUnits():
 		rsp = client.get('/')
 		assert rsp is not None
 		assert rsp.status_code == 200
-		assert rsp.data == 'hello world'

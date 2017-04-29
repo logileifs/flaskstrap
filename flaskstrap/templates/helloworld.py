@@ -10,4 +10,5 @@ def index():
 	return '<img src="%s" alt="%s">' % (url, alt)
 
 
-app.run()
+if __name__ == '__main__':
+	app.run()
