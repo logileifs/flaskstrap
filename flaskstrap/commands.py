@@ -1,4 +1,5 @@
 from . import create_project
+from . import setup_server
 from .utils import dprint
 
 
@@ -9,3 +10,8 @@ def init(args):
 	except Exception:
 		exit('project name not provided')
 	create_project.run(name)
+
+
+def setup(args):
+	dprint('setup server')
+	setup_server.run(args)
