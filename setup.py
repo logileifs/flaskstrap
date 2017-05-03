@@ -26,6 +26,8 @@ setup(
 	zip_safe=False,
 	install_requires=[
 		'pyyaml',
+		'paramiko',
+		'termcolor',
 	],
 	entry_points={
 		"console_scripts": [

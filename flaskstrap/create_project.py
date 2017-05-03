@@ -17,7 +17,8 @@ def create_directory(name):
 	os.mkdir(name)
 
 
-def run(project_name):
+def run(args):
+	project_name = args.get('second', None)[0]
 	print('creating project ' + project_name)
 	project_dir = os.path.join(os.getcwd(), project_name)
 	interpreter = sys.executable
@@ -46,10 +47,11 @@ def run(project_name):
 
 	makefile = os.path.join(curr_path, 'templates/makefile')
 	makefile_dest = '%s/makefile' % project_name
-	virtualenv = interpreter.replace('/python', '')
+	#virtualenv = interpreter.replace('/python', '')
+	virtualenv = os.path.dirname(interpreter)
 	replace = {
-		'{{virtualenv}}': virtualenv,
-		'{{project_name}}': project_name
+		'{virtualenv}': virtualenv,
+		'{project_name}': project_name
 	}
 	prepare_file(makefile, makefile_dest, replace)
 
@@ -60,6 +62,8 @@ def run(project_name):
 	subprocess.Popen(cmd1, cwd=project_dir).wait()
 	cmd = (pip + ' freeze').split()
 
-	requirements = os.path.join(project_dir, 'requirements.txt')
+	requirements = os.path.join(project_dir, 'requirements-dev.txt')
 	with open(requirements, 'w') as f:
 		subprocess.call(cmd, stdout=f)
+
+	#subprocess.Popen('tree {0}'.format(project_name).split(), cwd=project_dir).wait()

@@ -4,7 +4,7 @@
 """flaskstrap.flaskstrap: provides entry point main()."""
 
 
-__version__ = "0.2.6"
+__version__ = "0.3.6"
 
 
 import argparse
@@ -15,8 +15,8 @@ from .utils import dprint
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command')
-parser.add_argument('name', nargs='*')
-parser.add_argument('host', nargs='*')
+parser.add_argument('second', nargs='*')
+#parser.add_argument('host', nargs='*')
 parser.add_argument('--debug', dest='debug', action='store_true')
 
 args = vars(parser.parse_args())

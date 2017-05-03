@@ -1,5 +1,6 @@
 from . import config as cfg
 import os
+from termcolor import cprint
 
 
 def dprint(string):
@@ -27,3 +28,11 @@ def prepare_file(source, destination, replace):
 				for key in replace:
 					line = line.replace(key, replace[key])
 				f2.write(line)
+
+
+def print_error(error):
+	cprint(error, 'red', attrs=['bold'])
+
+
+def print_cyan(text):
+	cprint(text, 'cyan', attrs=['bold'])

@@ -9,7 +9,7 @@ def init(args):
 		name = args.get('name', None)
 	except Exception:
 		exit('project name not provided')
-	create_project.run(name)
+	create_project.run(args)
 
 
 def setup(args):

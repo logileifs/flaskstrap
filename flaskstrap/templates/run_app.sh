@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+/home/{username}/.virtualenvs/{project_name}/bin/uwsgi --http-socket :8000 -p 2 --import /home/{username}/.uwsgi/bootstrap.py --module {project_name}:app -H /home/{username}/.virtualenvs/{project_name}/ --pidfile /tmp/{project_name}.pid

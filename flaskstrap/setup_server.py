@@ -5,6 +5,8 @@ from getpass import getpass
 import sys
 import os
 import paramiko
+from termcolor import colored
+import time
 
 client = paramiko.SSHClient()
 client.load_system_host_keys()
@@ -21,7 +23,8 @@ if sys.version_info[:2] <= (2, 7):
 
 def create_user():
 	global username
-	username = get_input('name of user to create: ')
+	message = colored('name of user to create: ', 'cyan', attrs=['bold'])
+	username = get_input(message)
 
 	cmd1 = 'adduser %s --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password' % username
 	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd1)
@@ -111,6 +114,20 @@ def install_dependencies():
 	print(output)
 	print('finished')
 
+	#message = colored('installing nodejs', 'red', attrs=['bold'])
+	print(colored('installing nodejs', 'red', attrs=['bold']))
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -')
+	print(ssh_stdout.read().decode('ascii'))
+
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('apt-get install -y nodejs')
+	print(ssh_stdout.read().decode('ascii'))
+
+	print(colored('INSTALLING PM2', 'red', attrs=['bold']))
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('npm install -g pm2')
+	#print(ssh_stdout.read().decode('ascii'))
+	print(colored('PM2 INSTALLED', 'red', attrs=['bold']))
+
+
 
 def create_virtualenv():
 	print('creating virtualenv')
@@ -122,6 +139,8 @@ def create_virtualenv():
 	# for now get the project name from current working directory
 	# later read this from project_settings.yml
 	project_name = os.getcwd().split('/')[-1]
+	message = colored('use python 2 or python 3 ', 'red', attrs=['bold'])
+	print(message)
 	mk_virtualenv = 'virtualenv /home/{0}/.virtualenvs/{1}'.format(username, project_name)
 	print(mk_virtualenv)
 	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(mk_virtualenv)
@@ -157,9 +176,91 @@ def setup_nginx_site():
 	output = ssh_stdout.read().decode('ascii')
 	print(output)
 
+	remove_nginx_default = 'rm /etc/nginx/sites-enabled/default'
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(remove_nginx_default)
+	output = ssh_stdout.read().decode('ascii')
+	print(output)
+
 	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('nginx -t')
 	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('service nginx restart')
 
+
+def setup_uwsgi():
+	project_name = get_project_name()
+	cmd = 'mkdir /home/{0}/.uwsgi'.format(username)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+
+	curr_path = get_current_path()
+	bootstrap_path = os.path.join(curr_path, 'templates/bootstrap.py')
+
+	with open(bootstrap_path, 'r') as f:
+		bootstrap = f.read().format(project_name=project_name)
+
+	# write bootstrap to /home/{{username}}/.uwsgi/bootstrap.py
+	sftp_client = client.open_sftp()
+
+	bootstrap_file = sftp_client.open('/home/{0}/.uwsgi/bootstrap.py'.format(username), 'w+')
+	bootstrap_file.write(bootstrap)
+	bootstrap_file.close()
+
+	sftp_client.close()
+
+	cmd = 'chmod +x /home/{0}/.uwsgi/bootstrap.py'.format(username)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+
+
+def create_run_script():
+	project_name = get_project_name()
+	curr_path = get_current_path()
+	run_script_path = os.path.join(curr_path, 'templates/run_app.sh')
+
+	with open(run_script_path, 'r') as f:
+		run_script = f.read().format(project_name=project_name, username=username)
+
+	sftp_client = client.open_sftp()
+
+	run_script_file = sftp_client.open('/home/{0}/run_app.sh'.format(username), 'w+')
+	run_script_file.write(run_script)
+	run_script_file.close()
+
+	sftp_client.close()
+
+	cmd = 'chmod +x /home/{0}/run_app.sh'.format(username)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+
+	cmd = 'chown -R {0}:{0} /home/{0}/run_app.sh'.format(username)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+
+
+def make_deploy_directory():
+	project_name = get_project_name()
+	cmd = 'mkdir -p /home/{0}/{1}'.format(username, project_name)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+
+	cmd = 'chown -R {0}:{0} /home/{0}/{1}'.format(username, project_name)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+
+
+def start_process_manager():
+	print(colored('STARTING PM2 PROCESS MANAGER', 'red', attrs=['bold']))
+	project_name = get_project_name()
+	#cmd = 'pm2 start run_app.sh --name {0} --user {1}'.format(project_name, username)
+	cmd = 'su - {0} -c "pm2 start run_app.sh --name {1}"'.format(username, project_name)
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+	#print(ssh_stdout.read().decode('ascii'))
+	time.sleep(5)
+
+	cmd = 'pm2 startup'
+	print(colored(cmd, 'red', attrs=['bold']))
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+	#print(ssh_stdout.read().decode('ascii'))
+	time.sleep(5)
+
+	cmd = 'pm2 save'
+	print(colored(cmd, 'red', attrs=['bold']))
+	ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
+	#print(ssh_stdout.read().decode('ascii'))
+	time.sleep(5)
 
 
 def run(args):
@@ -170,9 +271,10 @@ def run(args):
 	dprint('cwd: ' + cwd)
 	dprint('interpreter: ' + interpreter)
 	try:
-		host = args.get('name', None)[0]
+		host = args.get('second', None)[0]
 	except Exception:
-		host = get_input('host address: ')
+		message = colored('host address: ', 'cyan', attrs=['bold'])
+		host = get_input(message)
 		#exit('host address missing')
 	try:
 		client.connect(host, username='root')
@@ -189,5 +291,13 @@ def run(args):
 	install_dependencies()
 	create_virtualenv()
 	setup_nginx_site()
+
+	# create uwsgi bootstrap script
+	setup_uwsgi()
+	# create uwsgi startup file
+	create_run_script()
+	make_deploy_directory()
+	start_process_manager()
+	# install process manager
 
 	client.close()
