@@ -29,4 +29,4 @@ new_project/
 Create a new flask project called project_name
 
 ### flaskstrap setup
-Sets up a new server fully configured with nginx+uwsgi+upstart to run your application
+Sets up a new server fully configured with nginx+uwsgi+pm2 to run your application
