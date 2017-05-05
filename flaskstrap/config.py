@@ -1,1 +1,2 @@
 debug = False
+verbose = False

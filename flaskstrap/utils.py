@@ -4,7 +4,7 @@ from termcolor import cprint
 
 
 def dprint(string):
-	if cfg.debug:
+	if cfg.verbose:
 		print(string)
 
 
@@ -30,8 +30,8 @@ def prepare_file(source, destination, replace):
 				f2.write(line)
 
 
-def print_error(error):
-	cprint(error, 'red', attrs=['bold'])
+def eprint(error):
+	cprint(error, 'red', attrs=['bold', 'underline'])
 
 
 def print_cyan(text):
