@@ -4,7 +4,7 @@
 """flaskstrap.flaskstrap: provides entry point main()."""
 
 
-__version__ = "0.3.6"
+__version__ = "0.4.6.8"
 
 
 import sys
@@ -19,13 +19,14 @@ is_python2 = sys.version_info[0] == 2
 if is_python2:
 	FileExistsError = OSError
 else:
-	from builtin import FileExistsError
+	from builtins import FileExistsError
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
 	'-i',
 	'--interactive',
-	action="store_true",
+	dest='interactive',
+	action='store_true',
 	help='interactive mode'
 )
 parser.add_argument('command')
@@ -47,6 +48,9 @@ def main():
 		cfg.debug = True
 	if args.get('verbose', False):
 		cfg.verbose = True
+	if args.get('interactive', False):
+		cfg.interactive = True
+
 	dprint(args)
 	dprint("flaskstrap version %s." % __version__)
 	command = args.get('command', None)

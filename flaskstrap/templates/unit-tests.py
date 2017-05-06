@@ -1,4 +1,4 @@
-from {{project_name}} import app
+from {project_name} import app
 
 
 class TestUnits():

@@ -1,0 +1,10 @@
+# this file stores sensitive information about your server
+# and should not be checked in to version control
+
+# the values here are placeholders - please replace them
+
+username: '{project_name}_admin'
+host_address: '127.0.0.1'
+# put password here for fully automated setup
+# leave blank to be prompted to enter password during setup
+password: null
