@@ -6,7 +6,8 @@
 
 import re
 from setuptools import setup
-
+#import yaml
+#import ruamel.yaml as yaml
 
 version = re.search(
 	'^__version__\s*=\s*"(.*)"',
@@ -14,6 +15,13 @@ version = re.search(
 	re.M
 ).group(1)
 
+"""with open('version.yml') as stream:
+	data = yaml.load(stream)
+major = str(data['major'])
+minor = str(data['minor'])
+patch = str(data['patch'])
+build = str(data['build'])
+version = major + '.' + minor + '.' + patch + '.' + build"""
 
 with open("README.rst", "rb") as f:
 	long_descr = f.read().decode("utf-8")
@@ -28,6 +36,8 @@ setup(
 		'pyyaml',
 		'paramiko',
 		'termcolor',
+		'ruamel.yaml',
+		'shyaml',
 	],
 	entry_points={
 		"console_scripts": [
